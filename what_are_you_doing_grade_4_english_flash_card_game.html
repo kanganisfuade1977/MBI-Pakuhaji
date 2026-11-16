@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Are You Doing? - Grade 4 English Flash Card Game</title>
+  <!-- Tailwind CSS for clean, responsive styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tone.js for cheerful synthesized educational sound effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <!-- Google Fonts: Fredoka & Nunito for playful, highly legible elementary typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --secondary: #f59e0b;
+      --accent: #10b981;
+      --pink: #ec4899;
+      --purple: #8b5cf6;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #fef9c3 50%, #fce7f3 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    /* 3D Toy-Like Tactile Buttons */
+    .btn-3d {
+      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18), 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .btn-3d:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.18), 0 14px 24px rgba(0, 0, 0, 0.14);
+    }
+    .btn-3d:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.18), 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 3D Flash Card Container (A6 Aspect Ratio ~ 1 : 1.414) */
+    .flash-card-3d {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 28px;
+      border: 5px solid #ffffff;
+      box-shadow:
+        0 14px 30px -5px rgba(59, 130, 246, 0.18),
+        0 8px 12px -4px rgba(0, 0, 0, 0.08),
+        inset 0 -6px 0 rgba(226, 232, 240, 0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+    .flash-card-3d:hover {
+      transform: translateY(-6px) scale(1.015);
+      box-shadow:
+        0 22px 38px -6px rgba(59, 130, 246, 0.25),
+        0 10px 16px -4px rgba(0, 0, 0, 0.1),
+        inset 0 -6px 0 rgba(203, 213, 225, 0.9);
+    }
+
+    /* Animations */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .animate-float {
+      animation: floatSlow 3.2s ease-in-out infinite;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      75% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop {
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes pulseRing {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 18px rgba(236, 72, 153, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+    }
+    .mic-listening {
+      animation: pulseRing 1.4s infinite;
+    }
+
+    /* Confetti Particle */
+    .confetti-piece {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 9999;
+      animation: confettiFall 2.4s linear forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(-20px) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translateY(105vh) rotate(720deg) scale(0.6); opacity: 0; }
+    }
+
+    /* Print Styles for A4 (4 A6 Cards per Page) */
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      #print-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12mm !important;
+        padding: 10mm !important;
+      }
+      .flash-card-3d {
+        box-shadow: none !important;
+        border: 2px solid #94a3b8 !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="no-print sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b-4 border-sky-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <!-- Brand / Title -->
+      <div class="flex items-center gap-2.5 cursor-pointer" onclick="navigateTo('home')">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-2xl shadow-md">
+          🎯
+        </div>
+        <div>
+          <h1 class="font-display text-lg sm:text-xl font-bold text-blue-700 leading-tight">
+            WHAT ARE YOU DOING?
+          </h1>
+          <p class="text-xs font-bold text-slate-500">Grade 4 English • Present Continuous</p>
+        </div>
+      </div>
+
+      <!-- Navigation Pills -->
+      <nav class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-1">
+        <button onclick="navigateTo('home')" id="nav-home" class="nav-btn px-3 py-1.5 rounded-xl font-bold text-sm bg-blue-600 text-white shadow-sm">
+          🏠 Home
+        </button>
+        <button onclick="navigateTo('deck')" id="nav-deck" class="nav-btn px-3 py-1.5 rounded-xl font-bold text-sm bg-sky-100 text-sky-800 hover:bg-sky-200">
+          🃏 20 Cards
+        </button>
+        <button onclick="navigateTo('grammar')" id="nav-grammar" class="nav-btn px-3 py-1.5 rounded-xl font-bold text-sm bg-amber-100 text-amber-800 hover:bg-amber-200">
+          📘 Pattern
+        </button>
+        <button onclick="navigateTo('special')" id="nav-special" class="nav-btn px-3 py-1.5 rounded-xl font-bold text-sm bg-purple-100 text-purple-800 hover:bg-purple-200">
+          ✨ Special
+        </button>
+      </nav>
+
+      <!-- Score & Sound Pill -->
+      <div class="flex items-center gap-2">
+        <div class="bg-amber-100 border-2 border-amber-300 px-3 py-1 rounded-2xl flex items-center gap-1.5 shadow-inner">
+          <span class="text-lg">⭐</span>
+          <span id="global-score" class="font-display font-bold text-amber-800 text-base">0</span>
+        </div>
+        <button onclick="toggleSound()" id="sound-toggle" title="Toggle Sound" class="w-10 h-10 rounded-2xl bg-emerald-100 border-2 border-emerald-300 text-emerald-700 flex items-center justify-center text-lg font-bold hover:bg-emerald-200">
+          🔊
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- TOAST / FEEDBACK BANNER (Replaces alert()) -->
+  <div id="toast-box" class="no-print fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 -translate-y-4">
+    <div id="toast-content" class="px-6 py-3 rounded-2xl font-display font-bold text-lg sm:text-xl text-white shadow-2xl border-4 border-white flex items-center gap-3">
+      <span id="toast-icon">⭐</span>
+      <span id="toast-text">Great job!</span>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE CARD ZOOM MODAL (👀 See / 💬 Sentence / 🎤 Speak) -->
+  <div id="card-modal" onclick="closeCardModal(event)" class="no-print hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="card-modal-body" onclick="event.stopPropagation()" class="max-w-md w-full animate-pop">
+      <!-- Populated dynamically -->
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6">
+
+    <!-- ==================== VIEW 1: HOME DASHBOARD ==================== -->
+    <section id="view-home" class="space-y-8 animate-pop">
+      <!-- Hero Banner -->
+      <div class="bg-white/95 rounded-3xl p-6 sm:p-8 border-4 border-sky-200 shadow-xl relative overflow-hidden">
+        <div class="absolute -right-8 -top-8 w-40 h-40 bg-amber-200/40 rounded-full blur-2xl"></div>
+        <div class="absolute -left-8 -bottom-8 w-40 h-40 bg-sky-200/50 rounded-full blur-2xl"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div class="space-y-3 text-center lg:text-left max-w-2xl">
+            <span class="inline-block px-4 py-1 rounded-full bg-amber-100 text-amber-800 font-extrabold text-xs sm:text-sm tracking-wide uppercase border border-amber-300">
+              🎓 Kelas 4 SD • Fase B • Interactive English Game
+            </span>
+            <h2 class="font-display text-3xl sm:text-5xl font-bold text-slate-800 leading-tight">
+              “What Are You Doing?”
+            </h2>
+            <p class="text-base sm:text-lg text-slate-600 font-semibold">
+              Belajar kosakata aktivitas sehari-hari & pola kalimat <span class="text-blue-600 font-extrabold">“I am + Verb-ing”</span> dengan 20 Flash Card 3D dan 5 Mode Permainan Seru!
+            </p>
+            <div class="flex flex-wrap justify-center lg:justify-start gap-3 pt-2">
+              <button onclick="navigateTo('deck')" class="btn-3d px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-display font-bold text-lg flex items-center gap-2">
+                <span>🃏</span> Explore 20 Flash Cards
+              </button>
+              <button onclick="startGameMode(1)" class="btn-3d px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-600 text-white font-display font-bold text-lg flex items-center gap-2">
+                <span>🎮</span> Start Playing!
+              </button>
+            </div>
+          </div>
+
+          <!-- Hero Cute 3D Classroom Mascot Preview -->
+          <div class="w-56 sm:w-64 flex-shrink-0 animate-float">
+            <div id="hero-card-preview" class="flash-card-3d p-4 text-center">
+              <div class="flex justify-between items-center text-xs font-extrabold text-blue-600 mb-1">
+                <span>CARD #01</span>
+                <span>👀 💬 🎤</span>
+              </div>
+              <div id="hero-svg-slot" class="w-36 h-36 mx-auto my-1"></div>
+              <div class="font-display font-bold text-xl text-slate-800">PLAYING</div>
+              <div class="text-sm font-extrabold text-blue-600">“I am playing.”</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 GAME MODES GRID -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display text-2xl sm:text-3xl font-bold text-slate-800 flex items-center gap-2">
+            <span>🕹️</span> Choose a Game Mode
+          </h3>
+          <span class="text-xs sm:text-sm font-bold text-slate-500 bg-white/80 px-3 py-1 rounded-full">
+            Pilih permainan untuk berlatih!
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Mode 1 -->
+          <div onclick="startGameMode(1)" class="cursor-pointer bg-white rounded-3xl p-6 border-4 border-sky-200 hover:border-sky-400 shadow-lg transition-all hover:-translate-y-1.5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-3 py-1 rounded-xl bg-sky-100 text-sky-700 font-extrabold text-xs">MODE 1</span>
+                <span class="text-3xl">🎯</span>
+              </div>
+              <h4 class="font-display text-2xl font-bold text-slate-800 mb-1">Guess The Action</h4>
+              <p class="text-sm text-slate-600 font-semibold mb-4">
+                Lihat gambar aktivitas dan pilih kalimat jawaban yang tepat dari 3 pilihan!
+              </p>
+            </div>
+            <button class="btn-3d w-full py-2.5 rounded-2xl bg-sky-500 text-white font-display font-bold text-base">
+              Play Mode 1 →
+            </button>
+          </div>
+
+          <!-- Mode 2 -->
+          <div onclick="startGameMode(2)" class="cursor-pointer bg-white rounded-3xl p-6 border-4 border-pink-200 hover:border-pink-400 shadow-lg transition-all hover:-translate-y-1.5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-3 py-1 rounded-xl bg-pink-100 text-pink-700 font-extrabold text-xs">MODE 2</span>
+                <span class="text-3xl">🎤</span>
+              </div>
+              <h4 class="font-display text-2xl font-bold text-slate-800 mb-1">Speaking Challenge</h4>
+              <p class="text-sm text-slate-600 font-semibold mb-4">
+                Ucapkan kalimat <span class="text-pink-600 font-bold">“I am + verb-ing”</span> dengan lantang menggunakan mikrofon!
+              </p>
+            </div>
+            <button class="btn-3d w-full py-2.5 rounded-2xl bg-pink-500 text-white font-display font-bold text-base">
+              Play Mode 2 →
+            </button>
+          </div>
+
+          <!-- Mode 3 -->
+          <div onclick="startGameMode(3)" class="cursor-pointer bg-white rounded-3xl p-6 border-4 border-emerald-200 hover:border-emerald-400 shadow-lg transition-all hover:-translate-y-1.5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-3 py-1 rounded-xl bg-emerald-100 text-emerald-700 font-extrabold text-xs">MODE 3</span>
+                <span class="text-3xl">🧩</span>
+              </div>
+              <h4 class="font-display text-2xl font-bold text-slate-800 mb-1">Match The Card</h4>
+              <p class="text-sm text-slate-600 font-semibold mb-4">
+                Pasangkan 5 gambar aktivitas di kiri dengan 5 kalimat bahasa Inggris di kanan!
+              </p>
+            </div>
+            <button class="btn-3d w-full py-2.5 rounded-2xl bg-emerald-500 text-white font-display font-bold text-base">
+              Play Mode 3 →
+            </button>
+          </div>
+
+          <!-- Mode 4 -->
+          <div onclick="startGameMode(4)" class="cursor-pointer bg-white rounded-3xl p-6 border-4 border-amber-200 hover:border-amber-400 shadow-lg transition-all hover:-translate-y-1.5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-3 py-1 rounded-xl bg-amber-100 text-amber-700 font-extrabold text-xs">MODE 4</span>
+                <span class="text-3xl">⚡</span>
+              </div>
+              <h4 class="font-display text-2xl font-bold text-slate-800 mb-1">Fast Flash Card</h4>
+              <p class="text-sm text-slate-600 font-semibold mb-4">
+                Ingat kartu dalam 5 detik sebelum menghilang! Uji daya ingat dan kecepatanmu.
+              </p>
+            </div>
+            <button class="btn-3d w-full py-2.5 rounded-2xl bg-amber-500 text-white font-display font-bold text-base">
+              Play Mode 4 →
+            </button>
+          </div>
+
+          <!-- Mode 5 -->
+          <div onclick="startGameMode(5)" class="cursor-pointer bg-white rounded-3xl p-6 border-4 border-purple-200 hover:border-purple-400 shadow-lg transition-all hover:-translate-y-1.5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-3 py-1 rounded-xl bg-purple-100 text-purple-700 font-extrabold text-xs">MODE 5</span>
+                <span class="text-3xl">🏆</span>
+              </div>
+              <h4 class="font-display text-2xl font-bold text-slate-800 mb-1">Two Player Battle</h4>
+              <p class="text-sm text-slate-600 font-semibold mb-4">
+                Duel cepat 👦 Player 1 vs 👧 Player 2! Tekan BUZZ tercepat dan jawab kalimatnya!
+              </p>
+            </div>
+            <button class="btn-3d w-full py-2.5 rounded-2xl bg-purple-600 text-white font-display font-bold text-base">
+              Play Mode 5 →
+            </button>
+          </div>
+
+          <!-- Special Challenge & Grammar Quick Card -->
+          <div onclick="navigateTo('special')" class="cursor-pointer bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-6 border-4 border-indigo-200 shadow-lg transition-all hover:-translate-y-1.5 flex flex-col justify-between text-white">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-3 py-1 rounded-xl bg-white/20 text-white font-extrabold text-xs">CLASSROOM BONUS</span>
+                <span class="text-3xl">🎭</span>
+              </div>
+              <h4 class="font-display text-2xl font-bold mb-1">Special Challenge Cards</h4>
+              <p class="text-sm text-indigo-100 font-semibold mb-4">
+                Kartu tantangan kelas: Act It Out, Speed Card, Bonus Card & Champion Card!
+              </p>
+            </div>
+            <button class="btn-3d w-full py-2.5 rounded-2xl bg-amber-400 text-slate-900 font-display font-bold text-base">
+              Open Special Cards →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Learning Objectives Card (Bahasa Indonesia sederhana) -->
+      <div class="bg-white/90 rounded-3xl p-6 border-4 border-emerald-200 shadow-md">
+        <h3 class="font-display text-xl font-bold text-emerald-800 mb-3 flex items-center gap-2">
+          <span>🎯</span> Tujuan Pembelajaran (Learning Goals)
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-sm font-bold text-slate-700">
+          <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200">1️⃣ Mengenali 20 kosakata aktivitas sehari-hari.</div>
+          <div class="bg-sky-50 p-3 rounded-2xl border border-sky-200">2️⃣ Memahami pertanyaan “What are you doing?”</div>
+          <div class="bg-amber-50 p-3 rounded-2xl border border-amber-200">3️⃣ Menjawab dengan pola “I am + Verb-ing.”</div>
+          <div class="bg-pink-50 p-3 rounded-2xl border border-pink-200">4️⃣ Mengucapkan kalimat bahasa Inggris dengan percaya diri.</div>
+          <div class="bg-purple-50 p-3 rounded-2xl border border-purple-200">5️⃣ Mencocokkan gambar aktivitas dengan kalimat yang tepat.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: 20 VOCABULARY FLASH CARDS ==================== -->
+    <section id="view-deck" class="hidden space-y-6 animate-pop">
+      <div class="no-print bg-white/95 rounded-3xl p-5 border-4 border-sky-200 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-blue-700">
+            🃏 20 Vocabulary Flash Cards
+          </h2>
+          <p class="text-sm font-bold text-slate-600">
+            Klik tombol <span class="text-blue-600">🎤 SAY IT!</span> pada kartu untuk mendengarkan pengucapan bahasa Inggris yang benar!
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <input type="text" id="card-search" oninput="renderFlashCardDeck()" placeholder="🔍 Search action (e.g. reading)..." class="px-4 py-2 rounded-2xl border-2 border-sky-200 focus:border-blue-500 outline-none font-bold text-sm" />
+          <button onclick="window.print()" class="btn-3d px-4 py-2 rounded-2xl bg-amber-400 text-slate-900 font-display font-bold text-sm flex items-center gap-1.5">
+            <span>🖨️</span> Print A6 Cards (4/A4)
+          </button>
+        </div>
+      </div>
+
+      <!-- Flash Card Grid (A6 ratio cards, prints 4 per A4 page) -->
+      <div id="print-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Cards injected via JS -->
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: LANGUAGE PATTERN & "-ING" GUIDE ==================== -->
+    <section id="view-grammar" class="hidden space-y-6 animate-pop">
+      <div class="bg-white/95 rounded-3xl p-6 sm:p-8 border-4 border-amber-300 shadow-xl space-y-6">
+        <div class="text-center max-w-2xl mx-auto">
+          <span class="px-4 py-1 rounded-full bg-amber-100 text-amber-800 font-extrabold text-xs uppercase">Language Pattern</span>
+          <h2 class="font-display text-3xl sm:text-4xl font-bold text-slate-800 mt-2">
+            How to Answer “What are you doing?”
+          </h2>
+          <p class="text-slate-600 font-bold mt-1">Gunakan pola Simple Present Continuous untuk menceritakan aktivitas yang sedang kamu lakukan sekarang!</p>
+        </div>
+
+        <!-- Question & Answer Formula Boxes -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-sky-50 border-4 border-sky-300 rounded-3xl p-6 text-center shadow-sm">
+            <span class="inline-block px-3 py-1 rounded-xl bg-sky-500 text-white font-extrabold text-xs mb-2">QUESTION (Pertanyaan)</span>
+            <p class="font-display text-2xl sm:text-3xl font-bold text-sky-900 mb-3">
+              “What are you doing?”
+            </p>
+            <button onclick="speakEnglish('What are you doing?')" class="btn-3d px-5 py-2 rounded-2xl bg-sky-500 text-white font-bold text-sm">
+              🔊 Listen Question
+            </button>
+          </div>
+
+          <div class="bg-emerald-50 border-4 border-emerald-300 rounded-3xl p-6 text-center shadow-sm">
+            <span class="inline-block px-3 py-1 rounded-xl bg-emerald-600 text-white font-extrabold text-xs mb-2">ANSWER PATTERN (Pola Jawaban)</span>
+            <p class="font-display text-2xl sm:text-3xl font-bold text-emerald-900 mb-3">
+              “I am + <span class="underline decoration-amber-400 decoration-4">VERB-ing</span>.”
+            </p>
+            <button onclick="speakEnglish('I am playing. I am reading. I am running.')" class="btn-3d px-5 py-2 rounded-2xl bg-emerald-600 text-white font-bold text-sm">
+              🔊 Listen Examples
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual "-ing" Spelling Transformation Guide -->
+        <div class="bg-amber-50/80 border-4 border-amber-200 rounded-3xl p-6">
+          <h3 class="font-display text-2xl font-bold text-amber-900 mb-4 text-center">
+            ✨ Magic “-ing” Rules (Cara Menambahkan -ing)
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="bg-white p-4 rounded-2xl border-2 border-amber-300 text-center shadow-sm">
+              <div class="text-xs font-extrabold text-slate-400">RULE 1: + ING</div>
+              <div class="font-display text-xl font-bold text-slate-700 mt-1">PLAY</div>
+              <div class="text-amber-500 font-black text-lg">↓ + ing</div>
+              <div class="font-display text-xl font-bold text-blue-600">PLAYING</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border-2 border-amber-300 text-center shadow-sm">
+              <div class="text-xs font-extrabold text-slate-400">RULE 1: + ING</div>
+              <div class="font-display text-xl font-bold text-slate-700 mt-1">READ</div>
+              <div class="text-amber-500 font-black text-lg">↓ + ing</div>
+              <div class="font-display text-xl font-bold text-blue-600">READING</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border-2 border-amber-300 text-center shadow-sm">
+              <div class="text-xs font-extrabold text-slate-400">RULE 1: + ING</div>
+              <div class="font-display text-xl font-bold text-slate-700 mt-1">EAT</div>
+              <div class="text-amber-500 font-black text-lg">↓ + ing</div>
+              <div class="font-display text-xl font-bold text-blue-600">EATING</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border-2 border-pink-300 text-center shadow-sm">
+              <div class="text-xs font-extrabold text-pink-500">RULE 2: DOUBLE N</div>
+              <div class="font-display text-xl font-bold text-slate-700 mt-1">RUN</div>
+              <div class="text-pink-500 font-black text-lg">↓ + n + ing</div>
+              <div class="font-display text-xl font-bold text-pink-600">RUNNING</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border-2 border-pink-300 text-center shadow-sm">
+              <div class="text-xs font-extrabold text-pink-500">RULE 2: DOUBLE M</div>
+              <div class="font-display text-xl font-bold text-slate-700 mt-1">SWIM</div>
+              <div class="text-pink-500 font-black text-lg">↓ + m + ing</div>
+              <div class="font-display text-xl font-bold text-pink-600">SWIMMING</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Interactive Sentence Builder -->
+        <div class="bg-indigo-50 border-4 border-indigo-200 rounded-3xl p-6 text-center space-y-4">
+          <h3 class="font-display text-2xl font-bold text-indigo-900">🗣️ Tap to Practice Sentences!</h3>
+          <div class="flex flex-wrap justify-center gap-3">
+            <button onclick="speakEnglish('I am reading.')" class="btn-3d px-4 py-2.5 rounded-2xl bg-white border-2 border-indigo-300 font-display font-bold text-indigo-800">🔊 I am reading.</button>
+            <button onclick="speakEnglish('I am eating.')" class="btn-3d px-4 py-2.5 rounded-2xl bg-white border-2 border-indigo-300 font-display font-bold text-indigo-800">🔊 I am eating.</button>
+            <button onclick="speakEnglish('I am running.')" class="btn-3d px-4 py-2.5 rounded-2xl bg-white border-2 border-indigo-300 font-display font-bold text-indigo-800">🔊 I am running.</button>
+            <button onclick="speakEnglish('I am playing.')" class="btn-3d px-4 py-2.5 rounded-2xl bg-white border-2 border-indigo-300 font-display font-bold text-indigo-800">🔊 I am playing.</button>
+            <button onclick="speakEnglish('I am writing.')" class="btn-3d px-4 py-2.5 rounded-2xl bg-white border-2 border-indigo-300 font-display font-bold text-indigo-800">🔊 I am writing.</button>
+            <button onclick="speakEnglish('I am dancing.')" class="btn-3d px-4 py-2.5 rounded-2xl bg-white border-2 border-indigo-300 font-display font-bold text-indigo-800">🔊 I am dancing.</button>
+            <button onclick="speakEnglish('I am singing.')" class="btn-3d px-4 py-2.5 rounded-2xl bg-white border-2 border-indigo-300 font-display font-bold text-indigo-800">🔊 I am singing.</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: SPECIAL CHALLENGE CARDS ==================== -->
+    <section id="view-special" class="hidden space-y-6 animate-pop">
+      <div class="bg-white/95 rounded-3xl p-6 border-4 border-purple-200 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-purple-800">
+            ✨ Special Challenge Cards
+          </h2>
+          <p class="text-sm font-bold text-slate-600">
+            Gunakan kartu tantangan spesial ini untuk aktivitas seru bersama teman atau guru di kelas!
+          </p>
+        </div>
+        <button onclick="drawRandomSpecialCard()" class="btn-3d px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-display font-bold text-base">
+          🎲 Draw Random Challenge!
+        </button>
+      </div>
+
+      <!-- Random Drawn Card Spotlight -->
+      <div id="special-spotlight" class="hidden bg-gradient-to-r from-amber-100 via-yellow-50 to-pink-100 rounded-3xl p-6 border-4 border-amber-400 shadow-xl text-center space-y-3 animate-pop">
+        <span class="px-3 py-1 rounded-full bg-amber-500 text-white font-extrabold text-xs uppercase">Active Challenge!</span>
+        <div id="spotlight-content" class="max-w-xl mx-auto"></div>
+      </div>
+
+      <!-- 6 Special Challenge Cards Grid -->
+      <div id="special-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Populated via JS -->
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 5: ACTIVE GAME STAGE ==================== -->
+    <section id="view-game" class="hidden space-y-6 animate-pop">
+      <!-- Game Top Bar -->
+      <div class="bg-white/95 rounded-3xl p-4 border-4 border-blue-200 shadow-md flex flex-wrap items-center justify-between gap-3">
+        <button onclick="navigateTo('home')" class="btn-3d px-4 py-2 rounded-2xl bg-slate-200 text-slate-800 font-display font-bold text-sm">
+          ← Back to Menu
+        </button>
+
+        <div class="text-center">
+          <span id="game-mode-badge" class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-extrabold text-xs uppercase">GAME MODE 1</span>
+          <h2 id="game-mode-title" class="font-display text-xl sm:text-2xl font-bold text-slate-800">Guess The Action</h2>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="bg-sky-100 px-3 py-1.5 rounded-2xl border-2 border-sky-300 font-display font-bold text-sky-800 text-sm">
+            Round: <span id="game-progress">1 / 5</span>
+          </div>
+          <div class="bg-amber-100 px-3 py-1.5 rounded-2xl border-2 border-amber-300 font-display font-bold text-amber-800 text-sm">
+            Points: <span id="session-score">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic Game Canvas / Board -->
+      <div id="game-stage-container" class="bg-white/95 rounded-3xl p-5 sm:p-8 border-4 border-sky-200 shadow-xl min-h-[430px] flex flex-col justify-center">
+        <!-- Mode 1, 2, 3, 4, or 5 rendered dynamically here -->
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 6: FINAL CELEBRATION SCREEN ==================== -->
+    <section id="view-final" class="hidden animate-pop">
+      <div class="max-w-2xl mx-auto bg-white rounded-3xl p-6 sm:p-10 border-4 border-amber-300 shadow-2xl text-center space-y-6 relative overflow-hidden">
+        <div class="text-4xl sm:text-5xl animate-bounce">🎉 🏆 🎉</div>
+        <h2 class="font-display text-3xl sm:text-5xl font-bold text-amber-500 drop-shadow-sm">
+          GREAT JOB!
+        </h2>
+        <p class="font-display text-2xl sm:text-3xl font-bold text-blue-700">
+          “You are an English Star!”
+        </p>
+
+        <!-- Final Score Pill -->
+        <div class="inline-block bg-gradient-to-r from-amber-400 to-orange-500 text-white px-8 py-3 rounded-3xl shadow-lg border-4 border-white">
+          <div class="text-xs font-extrabold uppercase tracking-wider">Final Score</div>
+          <div id="final-score-display" class="font-display text-4xl font-bold">90 / 100</div>
+        </div>
+
+        <!-- Skill Stars Breakdown -->
+        <div class="bg-sky-50 rounded-3xl p-5 border-2 border-sky-200 space-y-3 text-left max-w-md mx-auto">
+          <div class="flex items-center justify-between font-display font-bold text-lg text-slate-700">
+            <span>📚 VOCABULARY</span>
+            <span>⭐⭐⭐⭐⭐</span>
+          </div>
+          <div class="flex items-center justify-between font-display font-bold text-lg text-slate-700">
+            <span>🎤 SPEAKING</span>
+            <span>⭐⭐⭐⭐⭐</span>
+          </div>
+          <div class="flex items-center justify-between font-display font-bold text-lg text-slate-700">
+            <span>👂 LISTENING</span>
+            <span>⭐⭐⭐⭐</span>
+          </div>
+          <div class="flex items-center justify-between font-display font-bold text-lg text-slate-700">
+            <span>💪 CONFIDENCE</span>
+            <span>⭐⭐⭐⭐⭐</span>
+          </div>
+        </div>
+
+        <div class="font-display text-2xl font-bold text-emerald-600">
+          🏆 CONGRATULATIONS! 🏆
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap justify-center gap-3 pt-2">
+          <button onclick="replayLastGame()" class="btn-3d px-6 py-3 rounded-2xl bg-emerald-500 text-white font-display font-bold text-lg">
+            🔄 PLAY AGAIN
+          </button>
+          <button onclick="navigateTo('home')" class="btn-3d px-6 py-3 rounded-2xl bg-blue-600 text-white font-display font-bold text-lg">
+            🏠 HOME
+          </button>
+          <button onclick="navigateTo('deck')" class="btn-3d px-6 py-3 rounded-2xl bg-amber-400 text-slate-900 font-display font-bold text-lg">
+            📚 REVIEW FLASH CARDS
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    /* ==========================================================================
+       1. VOCABULARY DATA (20 GRADE 4 FLASH CARDS WITH 3D-STYLE SVG ILLUSTRATIONS)
+       ========================================================================== */
+    const FLASH_CARDS = [
+      { id: 1, num: "01", verb: "PLAYING", sentence: "I am playing.", thirdPerson: "He is playing.", gender: "boy", bg: "#dbeafe", accent: "#2563eb", scene: "playing" },
+      { id: 2, num: "02", verb: "READING", sentence: "I am reading.", thirdPerson: "She is reading.", gender: "girl", bg: "#fef3c7", accent: "#d97706", scene: "reading" },
+      { id: 3, num: "03", verb: "WRITING", sentence: "I am writing.", thirdPerson: "He is writing.", gender: "boy", bg: "#e0e7ff", accent: "#4f46e5", scene: "writing" },
+      { id: 4, num: "04", verb: "EATING", sentence: "I am eating.", thirdPerson: "He is eating.", gender: "boy", bg: "#ffedd5", accent: "#ea580c", scene: "eating" },
+      { id: 5, num: "05", verb: "DRINKING", sentence: "I am drinking.", thirdPerson: "She is drinking.", gender: "girl", bg: "#cffafe", accent: "#0891b2", scene: "drinking" },
+      { id: 6, num: "06", verb: "RUNNING", sentence: "I am running.", thirdPerson: "He is running.", gender: "boy", bg: "#dcfce7", accent: "#16a34a", scene: "running" },
+      { id: 7, num: "07", verb: "WALKING", sentence: "I am walking.", thirdPerson: "She is walking.", gender: "girl", bg: "#f3e8ff", accent: "#9333ea", scene: "walking" },
+      { id: 8, num: "08", verb: "JUMPING", sentence: "I am jumping.", thirdPerson: "He is jumping.", gender: "boy", bg: "#fce7f3", accent: "#db2777", scene: "jumping" },
+      { id: 9, num: "09", verb: "SINGING", sentence: "I am singing.", thirdPerson: "She is singing.", gender: "girl", bg: "#fae8ff", accent: "#c026d3", scene: "singing" },
+      { id: 10, num: "10", verb: "DANCING", sentence: "I am dancing.", thirdPerson: "She is dancing.", gender: "girl", bg: "#ffe4e6", accent: "#e11d48", scene: "dancing" },
+      { id: 11, num: "11", verb: "DRAWING", sentence: "I am drawing.", thirdPerson: "He is drawing.", gender: "boy", bg: "#fef9c3", accent: "#ca8a04", scene: "drawing" },
+      { id: 12, num: "12", verb: "COOKING", sentence: "I am cooking.", thirdPerson: "She is cooking.", gender: "girl", bg: "#fed7aa", accent: "#c2410c", scene: "cooking" },
+      { id: 13, num: "13", verb: "SLEEPING", sentence: "I am sleeping.", thirdPerson: "He is sleeping.", gender: "boy", bg: "#e0e7ff", accent: "#3730a3", scene: "sleeping" },
+      { id: 14, num: "14", verb: "SWIMMING", sentence: "I am swimming.", thirdPerson: "He is swimming.", gender: "boy", bg: "#bae6fd", accent: "#0284c7", scene: "swimming" },
+      { id: 15, num: "15", verb: "RIDING A BICYCLE", sentence: "I am riding a bicycle.", thirdPerson: "He is riding a bicycle.", gender: "boy", bg: "#bbf7d0", accent: "#15803d", scene: "bicycle" },
+      { id: 16, num: "16", verb: "WATCHING TV", sentence: "I am watching TV.", thirdPerson: "She is watching TV.", gender: "girl", bg: "#e2e8f0", accent: "#334155", scene: "tv" },
+      { id: 17, num: "17", verb: "LISTENING TO MUSIC", sentence: "I am listening to music.", thirdPerson: "She is listening to music.", gender: "girl", bg: "#f5d0fe", accent: "#a21caf", scene: "music" },
+      { id: 18, num: "18", verb: "DOING HOMEWORK", sentence: "I am doing my homework.", thirdPerson: "He is doing homework.", gender: "boy", bg: "#dbeafe", accent: "#1d4ed8", scene: "homework" },
+      { id: 19, num: "19", verb: "CLEANING THE ROOM", sentence: "I am cleaning my room.", thirdPerson: "She is cleaning the room.", gender: "girl", bg: "#ccfbf1", accent: "#0f766e", scene: "cleaning" },
+      { id: 20, num: "20", verb: "BRUSHING MY TEETH", sentence: "I am brushing my teeth.", thirdPerson: "He is brushing his teeth.", gender: "boy", bg: "#e0f2fe", accent: "#0369a1", scene: "teeth" }
+    ];
+
+    /* Special Classroom Challenge Cards */
+    const SPECIAL_CARDS = [
+      { id: "bonus", icon: "🎯", title: "BONUS CARD", prompt: "Say the sentence 3 times!", desc: "Ucapkan kalimat 'I am + verb-ing' sebanyak 3 kali dengan jelas!", color: "from-amber-400 to-orange-500", badge: "+20 BONUS POINTS" },
+      { id: "speed", icon: "⚡", title: "SPEED CARD", prompt: "Answer in 3 seconds!", desc: "Jawab pertanyaan 'What are you doing?' dalam waktu 3 detik!", color: "from-yellow-400 to-amber-500", badge: "FAST CHALLENGE" },
+      { id: "speaking", icon: "🎤", title: "SPEAKING CARD", prompt: "Say the sentence loudly!", desc: "Berdiri dan ucapkan kalimat dengan suara lantang dan percaya diri!", color: "from-pink-500 to-rose-600", badge: "SUPER VOICE" },
+      { id: "act", icon: "🎭", title: "ACT IT OUT", prompt: "Do the action and let your friend guess!", desc: "Peragakan gerakannya tanpa suara, lalu temanmu menebak dalam bahasa Inggris!", color: "from-emerald-400 to-teal-600", badge: "MIME GAME" },
+      { id: "memory", icon: "🧠", title: "MEMORY CARD", prompt: "Remember the picture!", desc: "Lihat kartu selama 3 detik, tutup mata, lalu sebutkan aktivitasnya!", color: "from-sky-400 to-blue-600", badge: "BRAIN POWER" },
+      { id: "champion", icon: "🏆", title: "CHAMPION CARD", prompt: "Make your own sentence!", desc: "Buat kalimatmu sendiri menggunakan pola 'I am ______ing.'!", color: "from-purple-500 to-indigo-600", badge: "ENGLISH STAR" }
+    ];
+
+    /* ==========================================================================
+       2. 3D-STYLED CUTE SVG CHARACTER ILLUSTRATION ENGINE
+       Generates vibrant, shaded 3D-look cartoon boy/girl characters + activity props
+       ========================================================================== */
+    function getCardIllustrationSVG(card) {
+      const isGirl = card.gender === "girl";
+      const shirtColor = isGirl ? "#f43f5e" : "#3b82f6";
+      const shirtShade = isGirl ? "#be123c" : "#1d4ed8";
+      const hairColor = isGirl ? "#451a03" : "#1e293b";
+      const uid = `grad_${card.id}_${Math.random().toString(36).slice(2, 6)}`;
+
+      // Action-specific 3D props & poses
+      let propSVG = "";
+      let eyeExpression = `
+        <circle cx="88" cy="72" r="4.5" fill="#1e293b"/>
+        <circle cx="89.5" cy="70.5" r="1.6" fill="#ffffff"/>
+        <circle cx="112" cy="72" r="4.5" fill="#1e293b"/>
+        <circle cx="113.5" cy="70.5" r="1.6" fill="#ffffff"/>
+      `;
+      let mouthSVG = `<path d="M93 84 Q100 92 107 84" stroke="#991b1b" stroke-width="3.2" fill="none" stroke-linecap="round"/>`;
+      let leftArm = `<path d="M74 106 Q56 118 62 132" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+      let rightArm = `<path d="M126 106 Q144 118 138 132" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+      let charTransform = "";
+
+      switch (card.scene) {
+        case "playing":
+          // Colorful 3D soccer/beach ball bouncing
+          propSVG = `
+            <circle cx="148" cy="134" r="19" fill="url(#ball_${uid})" stroke="#ffffff" stroke-width="2"/>
+            <path d="M136 122 Q148 134 160 122 M134 140 Q148 130 162 140" stroke="#ffffff" stroke-width="2.5" fill="none"/>
+            <ellipse cx="148" cy="157" rx="14" ry="4" fill="rgba(0,0,0,0.12)"/>
+          `;
+          rightArm = `<path d="M126 105 Q142 96 146 112" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+          break;
+
+        case "reading":
+          // Open 3D storybook in hands
+          propSVG = `
+            <path d="M68 116 L100 124 L132 116 L132 146 L100 154 L68 146 Z" fill="#ffffff" stroke="#3b82f6" stroke-width="3"/>
+            <line x1="100" y1="124" x2="100" y2="154" stroke="#93c5fd" stroke-width="3"/>
+            <line x1="75" y1="126" x2="93" y2="130" stroke="#cbd5e1" stroke-width="2.5"/>
+            <line x1="75" y1="134" x2="93" y2="138" stroke="#cbd5e1" stroke-width="2.5"/>
+            <line x1="107" y1="130" x2="125" y2="126" stroke="#cbd5e1" stroke-width="2.5"/>
+            <line x1="107" y1="138" x2="125" y2="134" stroke="#cbd5e1" stroke-width="2.5"/>
+          `;
+          leftArm = `<path d="M74 106 Q66 124 76 132" stroke="#fdba74" stroke-width="10" stroke-linecap="round" fill="none"/>`;
+          rightArm = `<path d="M126 106 Q134 124 124 132" stroke="#fdba74" stroke-width="10" stroke-linecap="round" fill="none"/>`;
+          break;
+
+        case "writing":
+          // Notebook + Big yellow 3D pencil
+          propSVG = `
+            <rect x="68" y="124" width="52" height="32" rx="5" fill="#fef08a" stroke="#eab308" stroke-width="2.5"/>
+            <line x1="76" y1="134" x2="112" y2="134" stroke="#94a3b8" stroke-width="2"/>
+            <line x1="76" y1="142" x2="106" y2="142" stroke="#94a3b8" stroke-width="2"/>
+            <g transform="translate(124,104) rotate(28)">
+              <rect x="0" y="0" width="9" height="34" rx="2" fill="#f59e0b"/>
+              <polygon points="0,34 9,34 4.5,44" fill="#fde68a"/>
+              <polygon points="3,40 6,40 4.5,44" fill="#1e293b"/>
+            </g>
+          `;
+          break;
+
+        case "eating":
+          // Bowl of yummy noodles/rice + spoon
+          propSVG = `
+            <path d="M74 128 Q100 158 126 128 Z" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+            <ellipse cx="100" cy="128" rx="26" ry="7" fill="#fef3c7"/>
+            <circle cx="94" cy="126" r="4" fill="#22c55e"/>
+            <circle cx="105" cy="127" r="4" fill="#f97316"/>
+            <path d="M122 104 L110 124" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="124" cy="102" rx="6" ry="4" fill="#cbd5e1"/>
+          `;
+          mouthSVG = `<circle cx="100" cy="86" r="5" fill="#991b1b"/>`;
+          break;
+
+        case "drinking":
+          // Cute juice box / cup with straw
+          propSVG = `
+            <rect x="88" y="112" width="24" height="34" rx="6" fill="#38bdf8" stroke="#0284c7" stroke-width="2.5"/>
+            <path d="M100 112 L100 92 L106 88" stroke="#f43f5e" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <circle cx="100" cy="129" r="6" fill="#fde047"/>
+          `;
+          mouthSVG = `<circle cx="100" cy="86" r="3.5" fill="#991b1b"/>`;
+          break;
+
+        case "running":
+          charTransform = `transform="rotate(-8 100 100)"`;
+          leftArm = `<path d="M74 104 Q52 94 48 112" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+          rightArm = `<path d="M126 104 Q148 116 152 98" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+          propSVG = `
+            <path d="M36 135 L58 135 M30 145 L52 145" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="100" cy="160" rx="34" ry="6" fill="rgba(0,0,0,0.12)"/>
+          `;
+          break;
+
+        case "walking":
+          leftArm = `<path d="M74 106 Q62 122 68 136" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+          rightArm = `<path d="M126 106 Q138 98 144 114" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+          propSVG = `
+            <path d="M55 158 Q100 152 145 158" stroke="#22c55e" stroke-width="6" stroke-linecap="round" fill="none"/>
+          `;
+          break;
+
+        case "jumping":
+          charTransform = `transform="translate(0, -12)"`;
+          leftArm = `<path d="M74 104 Q52 82 58 68" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+          rightArm = `<path d="M126 104 Q148 82 142 68" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+          propSVG = `
+            <path d="M75 162 Q100 154 125 162" stroke="#f59e0b" stroke-width="4" stroke-dasharray="6 5" fill="none"/>
+            <text x="144" y="64" font-size="20">✨</text>
+          `;
+          break;
+
+        case "singing":
+          // Microphone + musical notes
+          propSVG = `
+            <line x1="126" y1="124" x2="112" y2="98" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="110" cy="94" r="8" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+            <text x="134" y="72" font-size="22" fill="#ec4899">🎵</text>
+            <text x="46" y="82" font-size="18" fill="#8b5cf6">🎶</text>
+          `;
+          mouthSVG = `<ellipse cx="100" cy="86" rx="6" ry="7" fill="#991b1b"/>`;
+          break;
+
+        case "dancing":
+          charTransform = `transform="rotate(7 100 100)"`;
+          leftArm = `<path d="M74 104 Q50 86 60 72" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+          rightArm = `<path d="M126 106 Q150 116 146 132" stroke="#fdba74" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+          propSVG = `
+            <text x="38" y="74" font-size="20">🎶</text>
+            <text x="142" y="84" font-size="20">✨</text>
+          `;
+          break;
+
+        case "drawing":
+          // Art palette & paintbrush
+          propSVG = `
+            <ellipse cx="74" cy="134" rx="22" ry="15" fill="#fde68a" stroke="#d97706" stroke-width="2.5"/>
+            <circle cx="66" cy="130" r="4" fill="#ef4444"/>
+            <circle cx="76" cy="126" r="4" fill="#3b82f6"/>
+            <circle cx="84" cy="134" r="4" fill="#22c55e"/>
+            <line x1="114" y1="136" x2="138" y2="106" stroke="#92400e" stroke-width="5" stroke-linecap="round"/>
+            <path d="M136 108 Q144 98 148 104 Q142 112 136 108" fill="#ec4899"/>
+          `;
+          break;
+
+        case "cooking":
+          // Chef hat + frying pan
+          propSVG = `
+            <path d="M76 46 Q74 28 90 32 Q100 22 110 32 Q126 28 124 46 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2.5"/>
+            <rect x="78" y="43" width="44" height="8" rx="3" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <line x1="114" y1="132" x2="148" y2="132" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+            <ellipse cx="96" cy="134" rx="22" ry="9" fill="#475569"/>
+            <circle cx="96" cy="132" r="6" fill="#facc15"/>
+          `;
+          break;
+
+        case "sleeping":
+          // Closed happy eyes + pillow + Zzz
+          eyeExpression = `
+            <path d="M83 73 Q88 78 93 73" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M107 73 Q112 78 117 73" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round"/>
+          `;
+          mouthSVG = `<circle cx="100" cy="85" r="3.5" fill="#991b1b"/>`;
+          propSVG = `
+            <rect x="54" y="122" width="92" height="34" rx="14" fill="#c7d2fe" stroke="#818cf8" stroke-width="3"/>
+            <text x="132" y="62" font-family="Fredoka" font-weight="bold" font-size="18" fill="#4f46e5">Zzz...</text>
+          `;
+          break;
+
+        case "swimming":
+          // Blue water waves + swimming goggles
+          propSVG = `
+            <rect x="81" y="66" width="15" height="11" rx="4" fill="rgba(56,189,248,0.4)" stroke="#0284c7" stroke-width="2.5"/>
+            <rect x="104" y="66" width="15" height="11" rx="4" fill="rgba(56,189,248,0.4)" stroke="#0284c7" stroke-width="2.5"/>
+            <path d="M36 128 Q56 118 76 128 T116 128 T164 128 L164 162 L36 162 Z" fill="#38bdf8" opacity="0.9"/>
+            <path d="M44 142 Q68 134 92 142 T148 142" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>
+          `;
+          break;
+
+        case "bicycle":
+          // Cute 3D bicycle wheels & handlebars
+          propSVG = `
+            <circle cx="64" cy="144" r="18" fill="none" stroke="#1e293b" stroke-width="5"/>
+            <circle cx="64" cy="144" r="6" fill="#94a3b8"/>
+            <circle cx="136" cy="144" r="18" fill="none" stroke="#1e293b" stroke-width="5"/>
+            <circle cx="136" cy="144" r="6" fill="#94a3b8"/>
+            <path d="M64 144 L96 122 L124 122 L136 144 M96 122 L104 144 L64 144" stroke="#ef4444" stroke-width="5" fill="none" stroke-linejoin="round"/>
+            <path d="M118 112 L130 112" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+          `;
+          break;
+
+        case "tv":
+          // Cute cartoon TV screen
+          propSVG = `
+            <rect x="64" y="114" width="72" height="44" rx="10" fill="#334155" stroke="#0f172a" stroke-width="3"/>
+            <rect x="70" y="120" width="52" height="32" rx="6" fill="#38bdf8"/>
+            <circle cx="96" cy="136" r="9" fill="#facc15"/>
+            <circle cx="129" cy="128" r="3" fill="#ef4444"/>
+            <circle cx="129" cy="138" r="3" fill="#22c55e"/>
+          `;
+          break;
+
+        case "music":
+          // Big colorful headphones
+          propSVG = `
+            <path d="M66 72 C66 36, 134 36, 134 72" stroke="#ec4899" stroke-width="7" fill="none" stroke-linecap="round"/>
+            <rect x="58" y="62" width="12" height="22" rx="6" fill="#db2777"/>
+            <rect x="130" y="62" width="12" height="22" rx="6" fill="#db2777"/>
+            <text x="142" y="54" font-size="20">🎵</text>
+          `;
+          break;
+
+        case "homework":
+          // Desk + book + lamp/star
+          propSVG = `
+            <rect x="52" y="132" width="96" height="10" rx="4" fill="#d97706"/>
+            <rect x="62" y="142" width="10" height="20" fill="#b45309"/>
+            <rect x="128" y="142" width="10" height="20" fill="#b45309"/>
+            <rect x="76" y="118" width="44" height="14" rx="3" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
+            <text x="132" y="116" font-size="18">💡</text>
+          `;
+          break;
+
+        case "cleaning":
+          // Broom sweeping sparkles
+          propSVG = `
+            <line x1="126" y1="88" x2="104" y2="140" stroke="#b45309" stroke-width="6" stroke-linecap="round"/>
+            <path d="M92 138 L116 138 L122 158 L86 158 Z" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+            <text x="54" y="144" font-size="18">✨</text>
+            <text x="132" y="148" font-size="18">✨</text>
+          `;
+          break;
+
+        case "teeth":
+          // Toothbrush + bubbly foam
+          propSVG = `
+            <line x1="106" y1="88" x2="144" y2="96" stroke="#06b6d4" stroke-width="6" stroke-linecap="round"/>
+            <rect x="100" y="83" width="12" height="7" rx="2" fill="#ffffff"/>
+            <circle cx="96" cy="86" r="4" fill="#ffffff" opacity="0.9"/>
+            <circle cx="104" cy="88" r="4" fill="#ffffff" opacity="0.9"/>
+            <text x="132" y="76" font-size="18">✨</text>
+          `;
+          mouthSVG = `<rect x="91" y="82" width="18" height="7" rx="3.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>`;
+          break;
+      }
+
+      return `
+        <svg viewBox="0 0 200 175" class="w-full h-full drop-shadow-md">
+          <defs>
+            <radialGradient id="skin_${uid}" cx="40%" cy="35%" r="65%">
+              <stop offset="0%" stop-color="#ffedd5"/>
+              <stop offset="70%" stop-color="#fed7aa"/>
+              <stop offset="100%" stop-color="#fdba74"/>
+            </radialGradient>
+            <linearGradient id="shirt_${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="${shirtColor}"/>
+              <stop offset="100%" stop-color="${shirtShade}"/>
+            </linearGradient>
+            <radialGradient id="ball_${uid}" cx="35%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#fde047"/>
+              <stop offset="60%" stop-color="#f97316"/>
+              <stop offset="100%" stop-color="#dc2626"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Soft 3D Circular Backdrop -->
+          <circle cx="100" cy="92" r="74" fill="${card.bg}" />
+          <circle cx="100" cy="92" r="64" fill="#ffffff" opacity="0.45" />
+
+          <g ${charTransform}>
+            <!-- Hair Back (for girl) -->
+            ${isGirl ? `
+              <circle cx="70" cy="64" r="14" fill="${hairColor}"/>
+              <circle cx="130" cy="64" r="14" fill="${hairColor}"/>
+            ` : ''}
+
+            <!-- Arms -->
+            ${leftArm}
+            ${rightArm}
+
+            <!-- 3D Rounded Torso / Shirt -->
+            <path d="M72 102 Q100 94 128 102 L134 146 Q100 154 66 146 Z" fill="url(#shirt_${uid})"/>
+            <!-- Shirt Collar Highlight -->
+            <path d="M88 100 Q100 110 112 100" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.8"/>
+
+            <!-- 3D Cute Head -->
+            <circle cx="100" cy="72" r="28" fill="url(#skin_${uid})"/>
+
+            <!-- Rosy Cheeks -->
+            <ellipse cx="82" cy="80" rx="5" ry="3" fill="#fda4af" opacity="0.75"/>
+            <ellipse cx="118" cy="80" rx="5" ry="3" fill="#fda4af" opacity="0.75"/>
+
+            <!-- Hair Front -->
+            <path d="M72 68 C72 40, 128 40, 128 68 C120 54, 80 54, 72 68 Z" fill="${hairColor}"/>
+            ${isGirl ? `<circle cx="74" cy="54" r="5" fill="#facc15"/><circle cx="126" cy="54" r="5" fill="#facc15"/>` : ''}
+
+            <!-- Eyes & Smile -->
+            ${eyeExpression}
+            ${mouthSVG}
+          </g>
+
+          <!-- Activity 3D Props -->
+          ${propSVG}
+        </svg>
+      `;
+    }
+
+    /* ==========================================================================
+       3. AUDIO & SPEECH ENGINE (TONE.JS SFX + WEB SPEECH TTS & STT)
+       ========================================================================== */
+    let soundEnabled = true;
+    let synth = null;
+
+    function initAudio() {
+      if (!synth && window.Tone) {
+        synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        synth.volume.value = -6;
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById("sound-toggle");
+      btn.textContent = soundEnabled ? "🔊" : "🔇";
+      btn.className = soundEnabled
+        ? "w-10 h-10 rounded-2xl bg-emerald-100 border-2 border-emerald-300 text-emerald-700 flex items-center justify-center text-lg font-bold hover:bg-emerald-200"
+        : "w-10 h-10 rounded-2xl bg-slate-200 border-2 border-slate-300 text-slate-500 flex items-center justify-center text-lg font-bold";
+    }
+
+    function playSFX(type) {
+      if (!soundEnabled || !window.Tone) return;
+      try {
+        initAudio();
+        if (Tone.context.state !== "running") Tone.start();
+        const now = Tone.now();
+        if (type === "correct") {
+          synth.triggerAttackRelease(["C5", "E5", "G5"], "16n", now);
+          synth.triggerAttackRelease(["C6"], "8n", now + 0.14);
+        } else if (type === "wrong") {
+          synth.triggerAttackRelease(["E4", "Eb4"], "8n", now);
+        } else if (type === "buzz") {
+          synth.triggerAttackRelease(["G5", "C6"], "16n", now);
+        } else if (type === "tick") {
+          synth.triggerAttackRelease(["A5"], "32n", now);
+        } else if (type === "win") {
+          synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "8n", now);
+          synth.triggerAttackRelease(["E5", "G5", "B5", "E6"], "4n", now + 0.2);
+        }
+      } catch (e) {
+        // Ignore audio context autoplay restrictions gracefully
+      }
+    }
+
+    function speakEnglish(text) {
+      if (!soundEnabled || !("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      utterance.rate = 0.9; // Clear, slightly slower pace ideal for Grade 4 learners
+      utterance.pitch = 1.1;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    /* ==========================================================================
+       4. UI FEEDBACK, CONFETTI & NAVIGATION
+       ========================================================================== */
+    let totalGlobalScore = 0;
+
+    function addScore(points) {
+      totalGlobalScore += points;
+      document.getElementById("global-score").textContent = totalGlobalScore;
+    }
+
+    function showToast(message, type = "success") {
+      const box = document.getElementById("toast-box");
+      const content = document.getElementById("toast-content");
+      const icon = document.getElementById("toast-icon");
+      const text = document.getElementById("toast-text");
+
+      text.textContent = message;
+      if (type === "success") {
+        icon.textContent = "⭐";
+        content.className = "px-6 py-3 rounded-2xl font-display font-bold text-lg sm:text-xl text-white shadow-2xl border-4 border-white flex items-center gap-3 bg-gradient-to-r from-emerald-500 to-teal-600";
+      } else if (type === "error") {
+        icon.textContent = "💡";
+        content.className = "px-6 py-3 rounded-2xl font-display font-bold text-lg sm:text-xl text-white shadow-2xl border-4 border-white flex items-center gap-3 bg-gradient-to-r from-rose-500 to-orange-500";
+      } else {
+        icon.textContent = "🎤";
+        content.className = "px-6 py-3 rounded-2xl font-display font-bold text-lg sm:text-xl text-white shadow-2xl border-4 border-white flex items-center gap-3 bg-gradient-to-r from-blue-500 to-indigo-600";
+      }
+
+      box.classList.remove("opacity-0", "-translate-y-4");
+      box.classList.add("opacity-100", "translate-y-0");
+
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        box.classList.add("opacity-0", "-translate-y-4");
+        box.classList.remove("opacity-100", "translate-y-0");
+      }, 2200);
+    }
+
+    function launchConfetti() {
+      const colors = ["#f59e0b", "#3b82f6", "#10b981", "#ec4899", "#8b5cf6", "#ef4444"];
+      for (let i = 0; i < 36; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti-piece";
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = (1.6 + Math.random() * 1.4) + "s";
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 3000);
+      }
+    }
+
+    function navigateTo(viewName) {
+      // Stop any running game timers
+      clearInterval(window._fastFlashTimer);
+
+      const views = ["home", "deck", "grammar", "special", "game", "final"];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) el.classList.add("hidden");
+      });
+
+      const target = document.getElementById(`view-${viewName}`);
+      if (target) target.classList.remove("hidden");
+
+      // Update active nav styling
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("ring-4", "ring-blue-300");
+      });
+      const activeNav = document.getElementById(`nav-${viewName}`);
+      if (activeNav) activeNav.classList.add("ring-4", "ring-blue-300");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ==========================================================================
+       5. RENDER 20 FLASH CARDS (A6 CARD FORMAT WITH 👀 💬 🎤) & SPECIAL CARDS
+       ========================================================================== */
+    function renderFlashCardDeck() {
+      const grid = document.getElementById("print-grid");
+      const query = (document.getElementById("card-search")?.value || "").toLowerCase().trim();
+
+      const filtered = FLASH_CARDS.filter(c =>
+        c.verb.toLowerCase().includes(query) ||
+        c.sentence.toLowerCase().includes(query) ||
+        c.num.includes(query)
+      );
+
+      grid.innerHTML = filtered.map(card => `
+        <div class="flash-card-3d p-5 flex flex-col justify-between aspect-[1/1.38] relative overflow-hidden">
+          <!-- Top Header: Card Number & Learning Icons -->
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-xl font-display font-bold text-sm text-white shadow-sm" style="background:${card.accent}">
+              CARD #${card.num}
+            </span>
+            <div class="flex items-center gap-1 text-sm">
+              <button onclick="openCardModal(${card.id}, 'see')" title="👀 See Picture" class="bg-sky-100 hover:bg-sky-200 px-2 py-0.5 rounded-lg transition">👀</button>
+              <button onclick="openCardModal(${card.id}, 'sentence')" title="💬 Make Sentence" class="bg-amber-100 hover:bg-amber-200 px-2 py-0.5 rounded-lg transition">💬</button>
+              <button onclick="openCardModal(${card.id}, 'speak')" title="🎤 Speak" class="bg-pink-100 hover:bg-pink-200 px-2 py-0.5 rounded-lg transition">🎤</button>
+            </div>
+          </div>
+
+          <!-- Big 3D Image -->
+          <div onclick="openCardModal(${card.id}, 'see')" class="cursor-pointer w-44 h-44 mx-auto my-2 transition-transform hover:scale-105">
+            ${getCardIllustrationSVG(card)}
+          </div>
+
+          <!-- Bold Vocabulary & Sentence -->
+          <div class="text-center space-y-1">
+            <div class="font-display font-bold text-2xl tracking-wide text-slate-800">
+              ${card.verb}
+            </div>
+            <div class="font-extrabold text-lg" style="color:${card.accent}">
+              “${card.sentence}”
+            </div>
+          </div>
+
+          <!-- Interactive Speak Button -->
+          <button onclick="speakEnglish('What are you doing? ${card.sentence}')" class="no-print btn-3d mt-3 w-full py-2.5 rounded-2xl text-white font-display font-bold text-base flex items-center justify-center gap-2" style="background:${card.accent}">
+            <span>🎤</span> SAY IT!
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function openCardModal(cardId, focusTab = "see") {
+      const card = FLASH_CARDS.find(c => c.id === cardId);
+      if (!card) return;
+      const modal = document.getElementById("card-modal");
+      const body = document.getElementById("card-modal-body");
+
+      const hintBanner = focusTab === "see"
+        ? "👀 LOOK AT THE PICTURE! What is the character doing?"
+        : focusTab === "sentence"
+          ? `💬 MAKE A SENTENCE: “I am + ${card.verb.toLowerCase()}”`
+          : `🎤 SPEAKING PRACTICE: Say “${card.sentence}” loudly!`;
+
+      body.innerHTML = `
+        <div class="flash-card-3d p-6 space-y-4 relative">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-xl font-display font-bold text-sm text-white" style="background:${card.accent}">
+              CARD #${card.num}
+            </span>
+            <button onclick="closeCardModal()" class="w-9 h-9 rounded-full bg-slate-200 hover:bg-slate-300 font-bold text-slate-700">✕</button>
+          </div>
+
+          <div class="bg-sky-50 border-2 border-sky-200 rounded-2xl px-4 py-2 text-center font-bold text-xs sm:text-sm text-sky-800">
+            ${hintBanner}
+          </div>
+
+          <div class="w-56 h-56 mx-auto">
+            ${getCardIllustrationSVG(card)}
+          </div>
+
+          <div class="text-center space-y-1">
+            <div class="font-display font-bold text-3xl text-slate-800">${card.verb}</div>
+            <div class="font-display font-bold text-2xl" style="color:${card.accent}">“${card.sentence}”</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <button onclick="speakEnglish('What are you doing?')" class="btn-3d py-3 rounded-2xl bg-amber-400 text-slate-900 font-display font-bold text-sm">
+              ❓ Ask Question
+            </button>
+            <button onclick="speakEnglish('${card.sentence}')" class="btn-3d py-3 rounded-2xl text-white font-display font-bold text-sm" style="background:${card.accent}">
+              🎤 Say Answer!
+            </button>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove("hidden");
+      speakEnglish(card.sentence);
+    }
+
+    function closeCardModal(event) {
+      if (!event || event.target.id === "card-modal") {
+        document.getElementById("card-modal").classList.add("hidden");
+      }
+    }
+
+    /* ==========================================================================
+       6. SPECIAL CHALLENGE CARDS & GAME ENGINE STATE
+       ========================================================================== */
+    function renderSpecialCards() {
+      const grid = document.getElementById("special-cards-grid");
+      if (!grid) return;
+
+      grid.innerHTML = SPECIAL_CARDS.map(sc => `
+        <div class="bg-white rounded-3xl p-6 border-4 border-purple-200 shadow-lg flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full bg-gradient-to-r ${sc.color} text-white font-extrabold text-xs">
+                ${sc.badge}
+              </span>
+              <span class="text-4xl">${sc.icon}</span>
+            </div>
+            <h3 class="font-display text-2xl font-bold text-slate-800">${sc.title}</h3>
+            <p class="font-display text-lg font-bold text-purple-700">“${sc.prompt}”</p>
+            <p class="text-sm font-semibold text-slate-600">${sc.desc}</p>
+          </div>
+          <button onclick="activateSpecialCard('${sc.id}')" class="btn-3d w-full py-2.5 rounded-2xl bg-gradient-to-r ${sc.color} text-white font-display font-bold text-base">
+            🎯 Try This Challenge!
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function drawRandomSpecialCard() {
+      const randomCard = SPECIAL_CARDS[Math.floor(Math.random() * SPECIAL_CARDS.length)];
+      activateSpecialCard(randomCard.id);
+    }
+
+    function activateSpecialCard(id) {
+      const sc = SPECIAL_CARDS.find(item => item.id === id);
+      const randomVocab = FLASH_CARDS[Math.floor(Math.random() * FLASH_CARDS.length)];
+      if (!sc || !randomVocab) return;
+
+      const spotlight = document.getElementById("special-spotlight");
+      const content = document.getElementById("spotlight-content");
+
+      spotlight.classList.remove("hidden");
+      content.innerHTML = `
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-5 pt-2">
+          <div class="w-36 h-36 bg-white rounded-2xl p-2 shadow-md flex-shrink-0">
+            ${getCardIllustrationSVG(randomVocab)}
+          </div>
+          <div class="text-center sm:text-left space-y-1.5">
+            <div class="font-display text-2xl font-bold text-slate-800">${sc.icon} ${sc.title}</div>
+            <div class="font-display text-xl font-bold text-rose-600">“${sc.prompt}”</div>
+            <div class="text-sm font-bold text-slate-700">Target Card: <span class="text-blue-700">${randomVocab.verb} — “${randomVocab.sentence}”</span></div>
+            <div class="pt-1 flex flex-wrap justify-center sm:justify-start gap-2">
+              <button onclick="speakEnglish('${sc.prompt} ${randomVocab.sentence}')" class="btn-3d px-4 py-2 rounded-xl bg-blue-600 text-white font-display font-bold text-sm">
+                🔊 Listen Prompt
+              </button>
+              <button onclick="addScore(15); playSFX('correct'); launchConfetti(); showToast('Challenge Complete! +15 Stars!', 'success')" class="btn-3d px-4 py-2 rounded-xl bg-emerald-500 text-white font-display font-bold text-sm">
+                ⭐ Done! (+15)
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      playSFX("buzz");
+      speakEnglish(sc.prompt);
+      spotlight.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    let currentMode = 1;
+    let lastPlayedMode = 1;
+    let currentRound = 0;
+    const TOTAL_ROUNDS = 5;
+    let sessionScore = 0;
+    let gameDeck = [];
+    let p1Score = 0;
+    let p2Score = 0;
+    let activeBuzzerPlayer = null;
+
+    const MODE_TITLES = {
+      1: "Guess The Action",
+      2: "Speaking Challenge",
+      3: "Match The Card",
+      4: "Fast Flash Card",
+      5: "Two Player Battle"
+    };
+
+    function startGameMode(mode) {
+      clearInterval(window._fastFlashTimer);
+      currentMode = mode;
+      lastPlayedMode = mode;
+      currentRound = 0;
+      sessionScore = 0;
+      p1Score = 0;
+      p2Score = 0;
+      activeBuzzerPlayer = null;
+
+      gameDeck = shuffleArray(FLASH_CARDS).slice(0, TOTAL_ROUNDS);
+
+      document.getElementById("game-mode-badge").textContent = `GAME MODE ${mode}`;
+      document.getElementById("game-mode-title").textContent = MODE_TITLES[mode] || "Game Mode";
+      document.getElementById("session-score").textContent = "0";
+
+      navigateTo("game");
+      renderCurrentGameRound();
+    }
+
+    function replayLastGame() {
+      startGameMode(lastPlayedMode);
+    }
+
+    function renderCurrentGameRound() {
+      clearInterval(window._fastFlashTimer);
+
+      if (currentMode !== 3 && currentRound >= TOTAL_ROUNDS) {
+        finishGame();
+        return;
+      }
+
+      document.getElementById("game-progress").textContent =
+        currentMode === 3 ? `${matchedPairsCount} / 5` : `${currentRound + 1} / ${TOTAL_ROUNDS}`;
+
+      if (currentMode === 1) renderMode1_GuessAction();
+      else if (currentMode === 2) renderMode2_SpeakingChallenge();
+      else if (currentMode === 3) renderMode3_MatchCard();
+      else if (currentMode === 4) renderMode4_FastFlash();
+      else if (currentMode === 5) renderMode5_TwoPlayerBattle();
+    }
+
+    function finishGame() {
+      playSFX("win");
+      launchConfetti();
+      const maxPossible = TOTAL_ROUNDS * 10;
+      const pctScore = Math.min(100, Math.round((sessionScore / maxPossible) * 100));
+      document.getElementById("final-score-display").textContent = `${pctScore} / 100`;
+      navigateTo("final");
+    }
+
+    /* ---------------- MODE 1: GUESS THE ACTION ---------------- */
+    function renderMode1_GuessAction() {
+      const target = gameDeck[currentRound];
+      const distractors = shuffleArray(FLASH_CARDS.filter(c => c.id !== target.id)).slice(0, 2);
+      const options = shuffleArray([target, ...distractors]);
+      const letters = ["A", "B", "C"];
+
+      const stage = document.getElementById("game-stage-container");
+      stage.innerHTML = `
+        <div class="max-w-xl mx-auto w-full text-center space-y-5">
+          <div class="flash-card-3d p-4 w-56 mx-auto">
+            <div class="text-xs font-extrabold text-sky-600 mb-1">CARD #${target.num}</div>
+            <div class="w-44 h-44 mx-auto">${getCardIllustrationSVG(target)}</div>
+          </div>
+
+          <div class="space-y-1">
+            <h3 class="font-display text-2xl sm:text-3xl font-bold text-slate-800">“What are you doing?”</h3>
+            <button onclick="speakEnglish('What are you doing?')" class="px-3 py-1 rounded-full bg-sky-100 text-sky-700 font-bold text-xs">
+              🔊 Listen Question
+            </button>
+          </div>
+
+          <div class="space-y-3 text-left">
+            ${options.map((opt, idx) => `
+              <button onclick="checkMode1Answer(this, ${opt.id === target.id}, '${opt.sentence}')" class="btn-3d w-full p-4 rounded-2xl bg-white hover:bg-sky-50 border-4 border-slate-200 flex items-center justify-between font-display font-bold text-xl text-slate-800">
+                <span class="flex items-center gap-3">
+                  <span class="w-9 h-9 rounded-xl bg-sky-100 text-sky-800 flex items-center justify-center text-base font-extrabold">${letters[idx]}</span>
+                  <span>${opt.sentence}</span>
+                </span>
+                <span class="status-icon text-2xl"></span>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `;
+      speakEnglish("What are you doing?");
+    }
+
+    function checkMode1Answer(btn, isCorrect, spokenSentence) {
+      if (btn.disabled) return;
+      const statusIcon = btn.querySelector(".status-icon");
+
+      if (isCorrect) {
+        document.querySelectorAll("#game-stage-container button").forEach(b => (b.disabled = true));
+        btn.classList.remove("border-slate-200");
+        btn.classList.add("border-emerald-500", "bg-emerald-50");
+        if (statusIcon) statusIcon.textContent = "✅ ⭐";
+
+        playSFX("correct");
+        launchConfetti();
+        showToast("Correct! Great job! +10 points", "success");
+        speakEnglish(`Great job! ${spokenSentence}`);
+
+        sessionScore += 10;
+        addScore(10);
+        document.getElementById("session-score").textContent = sessionScore;
+
+        setTimeout(() => {
+          currentRound++;
+          renderCurrentGameRound();
+        }, 1400);
+      } else {
+        btn.disabled = true;
+        btn.classList.remove("border-slate-200");
+        btn.classList.add("border-rose-400", "bg-rose-50", "animate-shake");
+        if (statusIcon) statusIcon.textContent = "❌";
+
+        playSFX("wrong");
+        showToast("Try again!", "error");
+        speakEnglish("Try again!");
+      }
+    }
+
+    /* ---------------- MODE 2: SPEAKING CHALLENGE ---------------- */
+    function renderMode2_SpeakingChallenge() {
+      const target = gameDeck[currentRound];
+      const stage = document.getElementById("game-stage-container");
+
+      stage.innerHTML = `
+        <div class="max-w-xl mx-auto w-full text-center space-y-5">
+          <div class="flash-card-3d p-4 w-60 mx-auto">
+            <div class="text-xs font-extrabold text-pink-600 mb-1">CARD #${target.num} • 🎤 SPEAKING</div>
+            <div class="w-44 h-44 mx-auto">${getCardIllustrationSVG(target)}</div>
+            <div class="font-display font-bold text-xl text-slate-800 mt-1">${target.verb}</div>
+          </div>
+
+          <div class="bg-pink-50 border-2 border-pink-200 rounded-2xl p-4 space-y-1">
+            <div class="text-xs font-extrabold text-pink-600 uppercase">Question:</div>
+            <div class="font-display text-2xl font-bold text-slate-800">“What are you doing?”</div>
+            <div class="text-sm font-bold text-slate-600 pt-1">
+              Ucapkan dengan suara: <span class="text-pink-600 font-extrabold text-lg">“${target.sentence}”</span>
+              <button onclick="speakEnglish('${target.sentence}')" class="ml-1 px-2 py-0.5 rounded-lg bg-white border border-pink-300 text-xs">🔊 Example</button>
+            </div>
+          </div>
+
+          <!-- Voice Status & Controls -->
+          <div id="speech-feedback" class="min-h-[44px] flex items-center justify-center font-display font-bold text-lg text-slate-600">
+            Tekan tombol 🎤 SPEAK lalu ucapkan kalimatnya!
+          </div>
+
+          <div class="flex flex-wrap justify-center gap-3">
+            <button id="btn-mic-speak" onclick="startSpeechRecognition('${target.sentence}', '${target.verb}')" class="btn-3d px-8 py-4 rounded-3xl bg-gradient-to-r from-pink-500 to-rose-600 text-white font-display font-bold text-2xl flex items-center gap-3">
+              <span>🎤</span> SPEAK
+            </button>
+            <button onclick="completeSpeakingSuccess('${target.sentence}')" class="btn-3d px-5 py-4 rounded-3xl bg-emerald-500 text-white font-display font-bold text-base">
+              ✅ I Said It! (+10)
+            </button>
+          </div>
+        </div>
+      `;
+
+      speakEnglish("What are you doing?");
+    }
+
+    function startSpeechRecognition(expectedSentence, expectedVerb) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const micBtn = document.getElementById("btn-mic-speak");
+      const feedback = document.getElementById("speech-feedback");
+
+      if (!SpeechRec) {
+        feedback.innerHTML = `<span class="text-amber-700">Browser mikrofon tidak aktif—ucapkan dengan lantang lalu klik <b>“✅ I Said It!”</b></span>`;
+        speakEnglish(expectedSentence);
+        return;
+      }
+
+      const recognition = new SpeechRec();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 3;
+
+      micBtn.classList.add("mic-listening");
+      feedback.innerHTML = `<span class="text-pink-600 animate-pulse">🎙️ Listening... Say: “${expectedSentence}”</span>`;
+
+      recognition.onresult = (event) => {
+        micBtn.classList.remove("mic-listening");
+        const spoken = event.results[0][0].transcript.toLowerCase();
+        feedback.innerHTML = `You said: <span class="text-blue-600 underline">“${spoken}”</span>`;
+
+        const keyWord = expectedVerb.toLowerCase().split(" ")[0];
+        if (spoken.includes(keyWord) || spoken.includes("i am") || spoken.includes("i'm")) {
+          completeSpeakingSuccess(expectedSentence);
+        } else {
+          playSFX("wrong");
+          showToast(`Almost! Try saying: "${expectedSentence}"`, "error");
+        }
+      };
+
+      recognition.onerror = () => {
+        micBtn.classList.remove("mic-listening");
+        feedback.innerHTML = `<span class="text-slate-600">Tidak terdengar jelas. Coba lagi atau klik <b>“✅ I Said It!”</b></span>`;
+      };
+
+      recognition.start();
+    }
+
+    function completeSpeakingSuccess(sentence) {
+      const feedback = document.getElementById("speech-feedback");
+      if (feedback) {
+        feedback.innerHTML = `<span class="text-emerald-600 text-2xl">Excellent! ⭐⭐⭐</span>`;
+      }
+      playSFX("correct");
+      launchConfetti();
+      showToast("Excellent! ⭐⭐⭐ +10 points", "success");
+      speakEnglish(`Excellent! ${sentence}`);
+
+      sessionScore += 10;
+      addScore(10);
+      document.getElementById("session-score").textContent = sessionScore;
+
+      setTimeout(() => {
+        currentRound++;
+        renderCurrentGameRound();
+      }, 1500);
+    }
+
+    /* ---------------- MODE 3: MATCH THE CARD (DRAG-AND-DROP + CLICK PAIRS) ---------------- */
+    let selectedLeftId = null;
+    let selectedRightId = null;
+    let matchedPairsCount = 0;
+    let draggedLeftId = null;
+
+    function renderMode3_MatchCard() {
+      selectedLeftId = null;
+      selectedRightId = null;
+      matchedPairsCount = 0;
+      draggedLeftId = null;
+
+      const leftCards = shuffleArray(gameDeck);
+      const rightCards = shuffleArray(gameDeck);
+
+      const stage = document.getElementById("game-stage-container");
+      stage.innerHTML = `
+        <div class="space-y-4">
+          <div class="text-center">
+            <p class="font-display text-lg sm:text-xl font-bold text-slate-700">
+              Seret (Drag & Drop) atau klik gambar di kiri ke kalimat yang cocok di kanan!
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <!-- Left Column: 5 Activity Images -->
+            <div class="space-y-3">
+              <div class="text-center font-display font-bold text-sky-700 text-sm uppercase">1. Picture (Drag or Tap)</div>
+              ${leftCards.map(c => `
+                <button id="match-left-${c.id}" draggable="true" ondragstart="handleMatchDragStart(event, ${c.id})" onclick="selectMatchItem('left', ${c.id})" class="w-full p-2.5 rounded-2xl bg-sky-50 hover:bg-sky-100 border-4 border-sky-200 flex items-center gap-4 transition-all cursor-grab active:cursor-grabbing">
+                  <div class="w-16 h-16 flex-shrink-0 bg-white rounded-xl p-1 shadow-sm pointer-events-none">
+                    ${getCardIllustrationSVG(c)}
+                  </div>
+                  <div class="text-left pointer-events-none">
+                    <span class="text-xs font-extrabold text-sky-600">CARD #${c.num}</span>
+                    <div class="font-display font-bold text-lg text-slate-700">What are you doing?</div>
+                  </div>
+                </button>
+              `).join("")}
+            </div>
+
+            <!-- Right Column: 5 Sentences -->
+            <div class="space-y-3">
+              <div class="text-center font-display font-bold text-emerald-700 text-sm uppercase">2. Sentence (Drop or Tap)</div>
+              ${rightCards.map(c => `
+                <button id="match-right-${c.id}" ondragover="handleMatchDragOver(event)" ondragleave="handleMatchDragLeave(event)" ondrop="handleMatchDrop(event, ${c.id}, '${c.sentence}')" onclick="selectMatchItem('right', ${c.id}, '${c.sentence}')" class="w-full h-[88px] px-5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 border-4 border-emerald-200 flex items-center justify-between font-display font-bold text-xl text-slate-800 transition-all">
+                  <span class="pointer-events-none">“${c.sentence}”</span>
+                  <span class="text-lg pointer-events-none">🔊</span>
+                </button>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function selectMatchItem(side, id, sentence = "") {
+      if (side === "left") {
+        const el = document.getElementById(`match-left-${id}`);
+        if (!el || el.disabled) return;
+        document.querySelectorAll("[id^='match-left-']").forEach(b => b.classList.remove("ring-4", "ring-blue-500"));
+        el.classList.add("ring-4", "ring-blue-500");
+        selectedLeftId = id;
+      } else {
+        const el = document.getElementById(`match-right-${id}`);
+        if (!el || el.disabled) return;
+        speakEnglish(sentence);
+        document.querySelectorAll("[id^='match-right-']").forEach(b => b.classList.remove("ring-4", "ring-emerald-500"));
+        el.classList.add("ring-4", "ring-emerald-500");
+        selectedRightId = id;
+      }
+
+      if (selectedLeftId !== null && selectedRightId !== null) {
+        const leftBtn = document.getElementById(`match-left-${selectedLeftId}`);
+        const rightBtn = document.getElementById(`match-right-${selectedRightId}`);
+
+        if (selectedLeftId === selectedRightId) {
+          leftBtn.disabled = true;
+          rightBtn.disabled = true;
+          leftBtn.classList.remove("ring-4", "ring-blue-500", "bg-sky-50", "border-sky-200");
+          rightBtn.classList.remove("ring-4", "ring-emerald-500", "bg-emerald-50", "border-emerald-200");
+          leftBtn.classList.add("bg-emerald-100", "border-emerald-500", "opacity-75");
+          rightBtn.classList.add("bg-emerald-100", "border-emerald-500", "opacity-75");
+
+          matchedPairsCount++;
+          sessionScore += 10;
+          addScore(10);
+          document.getElementById("session-score").textContent = sessionScore;
+          document.getElementById("game-progress").textContent = `${matchedPairsCount} / 5`;
+
+          playSFX("correct");
+          showToast("Perfect Match! +10 points", "success");
+
+          if (matchedPairsCount >= 5) {
+            launchConfetti();
+            setTimeout(() => finishGame(), 1200);
+          }
+        } else {
+          leftBtn.classList.add("animate-shake");
+          rightBtn.classList.add("animate-shake");
+          playSFX("wrong");
+          showToast("Try Again!", "error");
+          setTimeout(() => {
+            leftBtn.classList.remove("ring-4", "ring-blue-500", "animate-shake");
+            rightBtn.classList.remove("ring-4", "ring-emerald-500", "animate-shake");
+          }, 500);
+        }
+
+        selectedLeftId = null;
+        selectedRightId = null;
+      }
+    }
+
+    function handleMatchDragStart(event, id) {
+      draggedLeftId = id;
+      selectMatchItem("left", id);
+      if (event.dataTransfer) {
+        event.dataTransfer.setData("text/plain", String(id));
+      }
+    }
+
+    function handleMatchDragOver(event) {
+      event.preventDefault();
+      event.currentTarget.classList.add("ring-4", "ring-amber-400", "scale-[1.02]");
+    }
+
+    function handleMatchDragLeave(event) {
+      event.currentTarget.classList.remove("ring-4", "ring-amber-400", "scale-[1.02]");
+    }
+
+    function handleMatchDrop(event, rightId, sentence) {
+      event.preventDefault();
+      event.currentTarget.classList.remove("ring-4", "ring-amber-400", "scale-[1.02]");
+      if (draggedLeftId !== null) {
+        selectedLeftId = draggedLeftId;
+        selectMatchItem("right", rightId, sentence);
+        draggedLeftId = null;
+      }
+    }
+
+    /* ---------------- MODE 4: FAST FLASH CARD (5-SECOND MEMORY CHALLENGE) ---------------- */
+    function renderMode4_FastFlash() {
+      const target = gameDeck[currentRound];
+      let timeLeft = 5;
+
+      const stage = document.getElementById("game-stage-container");
+      stage.innerHTML = `
+        <div class="max-w-lg mx-auto w-full text-center space-y-5">
+          <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-amber-100 border-2 border-amber-400 font-display font-bold text-xl text-amber-800">
+            <span>⏱️ Memorize in:</span>
+            <span id="fast-timer" class="text-2xl text-rose-600">5s</span>
+          </div>
+
+          <div class="flash-card-3d p-6 w-64 mx-auto animate-pop">
+            <div class="text-xs font-extrabold text-amber-600 mb-1">CARD #${target.num}</div>
+            <div class="w-48 h-48 mx-auto">${getCardIllustrationSVG(target)}</div>
+            <div class="font-display font-bold text-2xl text-slate-800 mt-2">👀 LOOK CAREFULLY!</div>
+          </div>
+        </div>
+      `;
+
+      window._fastFlashTimer = setInterval(() => {
+        timeLeft--;
+        const timerEl = document.getElementById("fast-timer");
+        if (timerEl) timerEl.textContent = `${timeLeft}s`;
+        playSFX("tick");
+
+        if (timeLeft <= 0) {
+          clearInterval(window._fastFlashTimer);
+          showMode4Question(target);
+        }
+      }, 1000);
+    }
+
+    function showMode4Question(target) {
+      const distractors = shuffleArray(FLASH_CARDS.filter(c => c.id !== target.id)).slice(0, 2);
+      const options = shuffleArray([target, ...distractors]);
+      const letters = ["A", "B", "C"];
+      const questionText = target.gender === "girl" ? "What is the girl doing?" : "What is the boy doing?";
+
+      const stage = document.getElementById("game-stage-container");
+      stage.innerHTML = `
+        <div class="max-w-xl mx-auto w-full text-center space-y-5 animate-pop">
+          <div class="w-24 h-24 mx-auto rounded-3xl bg-amber-100 border-4 border-amber-300 flex items-center justify-center text-5xl">
+            🧠
+          </div>
+
+          <div class="space-y-1">
+            <h3 class="font-display text-2xl sm:text-3xl font-bold text-slate-800">“${questionText}”</h3>
+            <p class="text-sm font-bold text-slate-500">Apa yang tadi sedang dilakukan pada kartu?</p>
+          </div>
+
+          <div class="space-y-3 text-left">
+            ${options.map((opt, idx) => `
+              <button onclick="checkMode1Answer(this, ${opt.id === target.id}, '${opt.thirdPerson}')" class="btn-3d w-full p-4 rounded-2xl bg-white hover:bg-amber-50 border-4 border-slate-200 flex items-center justify-between font-display font-bold text-xl text-slate-800">
+                <span class="flex items-center gap-3">
+                  <span class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-base font-extrabold">${letters[idx]}</span>
+                  <span>${opt.thirdPerson}</span>
+                </span>
+                <span class="status-icon text-2xl"></span>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `;
+      speakEnglish(questionText);
+    }
+
+    /* ---------------- MODE 5: TWO PLAYER BATTLE ---------------- */
+    function renderMode5_TwoPlayerBattle() {
+      activeBuzzerPlayer = null;
+      const target = gameDeck[currentRound];
+      const stage = document.getElementById("game-stage-container");
+
+      stage.innerHTML = `
+        <div class="space-y-6">
+          <!-- Scoreboard Header -->
+          <div class="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <div class="bg-blue-50 border-4 border-blue-300 rounded-3xl p-4 text-center">
+              <div class="font-display text-xl font-bold text-blue-800">👦 PLAYER 1</div>
+              <div class="font-display text-3xl font-bold text-amber-500 mt-1">⭐ <span id="p1-score-val">${p1Score}</span></div>
+            </div>
+            <div class="bg-pink-50 border-4 border-pink-300 rounded-3xl p-4 text-center">
+              <div class="font-display text-xl font-bold text-pink-800">👧 PLAYER 2</div>
+              <div class="font-display text-3xl font-bold text-amber-500 mt-1">⭐ <span id="p2-score-val">${p2Score}</span></div>
+            </div>
+          </div>
+
+          <!-- Center Flash Card -->
+          <div class="text-center space-y-3">
+            <div class="inline-block px-5 py-1.5 rounded-full bg-purple-100 text-purple-800 font-display font-bold text-xl">
+              “What are you doing?”
+            </div>
+            <div class="w-52 h-52 mx-auto bg-white rounded-3xl p-3 border-4 border-purple-200 shadow-md">
+              ${getCardIllustrationSVG(target)}
+            </div>
+          </div>
+
+          <!-- Buzzer Controls -->
+          <div id="battle-controls" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <button onclick="playerBuzz(1, '${target.sentence}')" class="btn-3d py-5 rounded-3xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-display font-bold text-2xl">
+              🔔 PLAYER 1 BUZZ! <span class="text-xs block font-normal opacity-85">[Key: A]</span>
+            </button>
+            <button onclick="playerBuzz(2, '${target.sentence}')" class="btn-3d py-5 rounded-3xl bg-gradient-to-r from-pink-500 to-rose-600 text-white font-display font-bold text-2xl">
+              🔔 PLAYER 2 BUZZ! <span class="text-xs block font-normal opacity-85">[Key: L]</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      speakEnglish("What are you doing? Ready, buzz!");
+    }
+
+    function playerBuzz(playerNum, expectedSentence) {
+      if (activeBuzzerPlayer !== null) return;
+      activeBuzzerPlayer = playerNum;
+      playSFX("buzz");
+
+      const playerLabel = playerNum === 1 ? "👦 PLAYER 1" : "👧 PLAYER 2";
+      const badgeColor = playerNum === 1 ? "text-blue-700 bg-blue-100" : "text-pink-700 bg-pink-100";
+
+      const controls = document.getElementById("battle-controls");
+      controls.className = "max-w-xl mx-auto text-center space-y-4 bg-amber-50 p-5 rounded-3xl border-4 border-amber-300 animate-pop";
+      controls.innerHTML = `
+        <div class="inline-block px-4 py-1 rounded-full font-display font-bold text-lg ${badgeColor}">
+          ${playerLabel} BUZZED FIRST!
+        </div>
+        <p class="font-display text-xl font-bold text-slate-800">
+          Say the sentence: <span class="text-emerald-700">“I am ______ing.”</span>
+        </p>
+        <div class="text-xs font-bold text-slate-500">(Answer key: “${expectedSentence}”)</div>
+        <div class="flex flex-wrap justify-center gap-3">
+          <button onclick="resolveBattleRound(true, '${expectedSentence}')" class="btn-3d px-6 py-3 rounded-2xl bg-emerald-500 text-white font-display font-bold text-lg">
+            ✅ Correct (+10)
+          </button>
+          <button onclick="resolveBattleRound(false, '${expectedSentence}')" class="btn-3d px-6 py-3 rounded-2xl bg-rose-500 text-white font-display font-bold text-lg">
+            ❌ Wrong (0)
+          </button>
+        </div>
+      `;
+    }
+
+    function resolveBattleRound(isCorrect, expectedSentence) {
+      if (isCorrect) {
+        if (activeBuzzerPlayer === 1) p1Score += 10;
+        else p2Score += 10;
+
+        sessionScore += 10;
+        addScore(10);
+        playSFX("correct");
+        launchConfetti();
+        showToast(`Player ${activeBuzzerPlayer} gets +10 points!`, "success");
+        speakEnglish(`Great job! ${expectedSentence}`);
+      } else {
+        playSFX("wrong");
+        showToast("0 points! Next round!", "error");
+        speakEnglish(`The correct answer is: ${expectedSentence}`);
+      }
+
+      document.getElementById("session-score").textContent = sessionScore;
+
+      setTimeout(() => {
+        currentRound++;
+        if (currentRound >= TOTAL_ROUNDS) {
+          showBattleWinner();
+        } else {
+          renderCurrentGameRound();
+        }
+      }, 1400);
+    }
+
+    function showBattleWinner() {
+      playSFX("win");
+      launchConfetti();
+      const winnerText = p1Score > p2Score
+        ? "👦 PLAYER 1 IS THE ENGLISH CHAMPION!"
+        : p2Score > p1Score
+          ? "👧 PLAYER 2 IS THE ENGLISH CHAMPION!"
+          : "👦 & 👧 IT'S A TIE! BOTH ARE ENGLISH CHAMPIONS!";
+
+      const stage = document.getElementById("game-stage-container");
+      stage.innerHTML = `
+        <div class="max-w-xl mx-auto text-center space-y-6 animate-pop">
+          <div class="text-6xl">🏆</div>
+          <h3 class="font-display text-3xl sm:text-4xl font-bold text-amber-500">
+            ${winnerText}
+          </h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-blue-50 border-4 border-blue-300 rounded-3xl p-4">
+              <div class="font-display font-bold text-blue-800">👦 PLAYER 1</div>
+              <div class="font-display text-3xl font-bold text-amber-500">⭐ ${p1Score}</div>
+            </div>
+            <div class="bg-pink-50 border-4 border-pink-300 rounded-3xl p-4">
+              <div class="font-display font-bold text-pink-800">👧 PLAYER 2</div>
+              <div class="font-display text-3xl font-bold text-amber-500">⭐ ${p2Score}</div>
+            </div>
+          </div>
+          <div class="flex justify-center gap-3">
+            <button onclick="startGameMode(5)" class="btn-3d px-6 py-3 rounded-2xl bg-purple-600 text-white font-display font-bold text-lg">
+              🔄 Rematch!
+            </button>
+            <button onclick="finishGame()" class="btn-3d px-6 py-3 rounded-2xl bg-amber-400 text-slate-900 font-display font-bold text-lg">
+              🎉 Finish & Certificate
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       7. INITIALIZATION ON PAGE LOAD
+       ========================================================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      // Populate Hero Card Illustration (#01 PLAYING)
+      document.getElementById("hero-svg-slot").innerHTML = getCardIllustrationSVG(FLASH_CARDS[0]);
+
+      // Pre-render 20 Flash Cards & 6 Special Challenge Cards
+      renderFlashCardDeck();
+      renderSpecialCards();
+
+      // Keyboard shortcuts for Mode 5 Two-Player Battle (A = Player 1, L = Player 2)
+      window.addEventListener("keydown", (e) => {
+        if (currentMode === 5 && !document.getElementById("view-game").classList.contains("hidden")) {
+          const target = gameDeck[currentRound];
+          if (!target) return;
+          if (e.key.toLowerCase() === "a") playerBuzz(1, target.sentence);
+          if (e.key.toLowerCase() === "l") playerBuzz(2, target.sentence);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
